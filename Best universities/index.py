@@ -4,7 +4,6 @@ from dash.dependencies import Input, Output
 
 from app import app
 from apps import app1, app2
-from layouts import layout1, layout2
 import callbacks
 
 app.layout = html.Div([
