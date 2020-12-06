@@ -10,19 +10,16 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_table
 import pandas as pd
-import plotly.express as px
-import numpy as np
+import dash
+import urllib.parse
+
+app = dash.Dash(__name__, suppress_callback_exceptions=True)
 
 timesData = pd.read_csv("timesData.csv")
 
-df2016 = timesData[timesData.year == 2016].iloc[:20,:]
-num_students_size  = [float(each.replace(',', '.')) for each in df2016.num_students]
-
-num_students_size  = [float(each.replace(',', '.')) for each in df2016.num_students]
-
+df2016 = timesData[timesData.year==2016].iloc[:50,:]
+num_students_size  = [str(each).replace(',', '.') for each in df2016.num_students]
 international_color = [float(each) for each in df2016.international]
-df2016 = timesData[timesData.year == 2016].iloc[:20,:]
-num_students_size  = [float(each.replace(',', '.')) for each in df2016.num_students]
 
 fig1 = {
   "data": [
@@ -46,16 +43,16 @@ fig1 = {
 }
 
 layout1 = html.Div([
-    dcc.Link('Résultats de l\'ACP', href='/apps/app2'),
+    dcc.Link('Résultats de l\'ACP', href='/apps/app2'),    
+    html.Br(),
+    html.Br(),
+    html.A(html.Button('Chargement des données'),
+           id='data_download',
+           download='timesData.csv',
+           href="data:text/csv;charset=utf-8," + urllib.parse.quote(df2016.to_csv(index=False)),
+           target="_blank"),
+    html.Br(),
     html.H3('Teaching and world_rank for each university in 2016'),
-    # dcc.Dropdown(
-    #     id='app-1-dropdown',
-    #     options=[
-    #         {'label': 'App 1 - {}'.format(i), 'value': i} for i in [
-    #             'NYC', 'MTL', 'LA'
-    #         ]
-    #     ]
-    # ),
     html.Div([dash_table.DataTable(
         id='table',
         columns=[{"name": i, "id": i} for i in df2016.columns],
@@ -65,5 +62,8 @@ layout1 = html.Div([
     dcc.Graph(
         id='Teaching-world_rank-vs-university',
         figure=fig1
-    ) ])  
-])
+    ) ]),
+    html.Div(dcc.Markdown('''### Matrice de corrélation''')),
+    html.Div(style = {"float":"left"},children = [
+        html.Img(src=app.get_asset_url('correlation_matrix.png'))]) 
+ ])

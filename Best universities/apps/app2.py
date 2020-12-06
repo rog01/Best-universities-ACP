@@ -25,17 +25,15 @@ n_comp = 8
 data = pd.read_csv("timesData.csv")
 
 data = data[data.year==2016].iloc[:50,:]
-# selection des colonnes à prendre en compte dans l'ACP
-#data_pca = data[["world_rank","university_name","country","teaching","international","research","citations","income","total_score","num_students","student_staff_ratio","international_students","female_male_ratio","year"]]
 
 data.income = pd.to_numeric(data.income, errors='coerce')
 data.num_students  = [str(each).replace(',', '') for each in data.num_students]
 data.num_students =  pd.to_numeric(data.num_students, errors='coerce')
-
 data.international =  pd.to_numeric(data.international, errors='coerce')
-
 data.total_score =  pd.to_numeric(data.total_score, errors='coerce')
+
 X=data.values
+# selection des colonnes à prendre en compte dans l'ACP
 data_pca = data[["teaching","international","research","citations","income","total_score","num_students","student_staff_ratio"]]
 
 # préparation des données pour l'ACP
@@ -53,10 +51,10 @@ pca = PCA(n_components=n_comp)
 pca.fit(X_scaled)
 
 # Eboulis des valeurs propres
-#display_scree_plot(pca)
 scree = pca.explained_variance_ratio_*100
-fig = px.bar(X_scaled, x=np.arange(len(scree))+1,
+fig = px.line(X_scaled, x=np.arange(len(scree))+1,
              y=scree.cumsum())
+
 # Visualize all the principal components
 components = pca.fit_transform(X_scaled)
 labels = {
@@ -71,7 +69,6 @@ fig2 = px.scatter_matrix(
     color=data["university_name"]
 )
 fig2.update_traces(diagonal_visible=False)
-#fig2.show()
 
 #Projection orthogonal
 # loadings = pca.components_.T * np.sqrt(pca.explained_variance_)
@@ -96,7 +93,6 @@ fig2.update_traces(diagonal_visible=False)
 
 layout2 = html.Div([
     dcc.Link('Première analyse des données', href='/apps/app1'),
-    html.H3('Best universities in 2016 PCA analysis'),
     html.Div([
     html.H3('Eboulis des valeurs propres'),
     dcc.Graph(
@@ -111,7 +107,7 @@ layout2 = html.Div([
         figure=fig2
     )
     ]), 
-    html.Div(dcc.Markdown('''## Corrélations des CP''')),
+    html.Div(dcc.Markdown('''### Corrélations des CP''')),
     html.Div(style = {"float":"left"},children = [
         html.Img(src=app.get_asset_url('Correlation_F1_F2.png')),
         html.Img(src=app.get_asset_url('Correlation_F3_F4.png'))]),
