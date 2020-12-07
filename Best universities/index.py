@@ -1,10 +1,12 @@
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-
-from app import app
+import dash
 from apps import app1, app2
 import callbacks
+
+app = dash.Dash(__name__)
+server = app.server
 
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
@@ -22,4 +24,5 @@ def display_page(pathname):
         return 'Cette url n\'est pas valide'
 
 if __name__ == '__main__':
-    app.run_server(debug=True, host='127.0.0.1',port=8060)
+    #app.run_server(debug=True, host='127.0.0.1',port=8060)
+    app.run_server()
